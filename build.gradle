@@ -1,0 +1,47 @@
+group 'net.digitaltsunami'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'maven'
+//apply plugin: 'jacoco'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    testCompile 'org.testng:testng:6.9.10'
+}
+
+task createJar(type: Jar)
+
+artifacts {
+    archives createJar
+}
+
+test {
+    useTestNG()
+}
+
+
+/*
+jacocoTestReport {
+    doFirst {
+        files('build/intermediates/classes/debug').getFiles().each { file ->
+            if (file.name.contains('$$')) {
+                file.renameTo(file.path.replace('$$', '$'))
+            }
+        }
+    }
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination "${buildDir}/jacocoHtml"
+    }
+}
+*/
+

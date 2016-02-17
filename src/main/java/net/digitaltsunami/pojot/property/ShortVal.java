@@ -1,0 +1,30 @@
+package net.digitaltsunami.pojot.property;
+
+public class ShortVal implements PropertyValue {
+    @Override
+    public Object getValue() {
+        return Short.valueOf((short) 290);
+    }
+
+    @Override
+    public Object getSmallValue() {
+        return Short.MIN_VALUE;
+    }
+
+    @Override
+    public Object getLargeValue() {
+        return Short.MAX_VALUE;
+    }
+
+    /**
+     * Return a null value for the type.
+     *
+     * @return null unconditionally
+     */
+    @Override
+    public Object getDefaultValue() {
+        return null;
+    }
+
+
+}
