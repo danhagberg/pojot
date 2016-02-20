@@ -1,9 +1,10 @@
-group 'net.digitaltsunami'
-version '1.0-SNAPSHOT'
-
 apply plugin: 'java'
 apply plugin: 'maven'
-//apply plugin: 'jacoco'
+apply plugin: 'signing'
+
+group 'net.digitaltsunami'
+archivesBaseName = 'pojot'
+version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -17,31 +18,69 @@ dependencies {
     testCompile 'org.testng:testng:6.9.10'
 }
 
-task createJar(type: Jar)
-
-artifacts {
-    archives createJar
-}
-
 test {
     useTestNG()
 }
 
+// -------- Publishing to OSS SonaType -----------
 
-/*
-jacocoTestReport {
-    doFirst {
-        files('build/intermediates/classes/debug').getFiles().each { file ->
-            if (file.name.contains('$$')) {
-                file.renameTo(file.path.replace('$$', '$'))
-            }
-        }
-    }
-    reports {
-        xml.enabled true
-        csv.enabled false
-        html.destination "${buildDir}/jacocoHtml"
-    }
+task createJar(type: Jar)
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
 }
-*/
 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar, createJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+
+  javadoc.failOnError = false
+
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+        authentication(userName: ossrhUsername, password: ossrhPassword)
+      }
+
+      pom.project {
+        name 'Pojot - POJO Tester'
+        packaging 'jar'
+        artifactId 'pojot'
+        description 'A library to drive testing of POJOs by validating simple getter and setters, equals, hashcode, and to string methods.'
+        url 'https://github.com/danhagberg/pojot'
+
+        scm {
+          connection 'scm:git:git@github.com:danhagberg/pojot.git'
+          developerConnection 'scm:git:git@github.com:danhagberg/pojot.git'
+          url 'https://github.com/danhagberg/pojot'
+        }
+
+        licenses {
+          license {
+            name 'The Apache License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          }
+        }
+      }
+    }
+  }
+}
+// -------- End of Publishing to OSS SonaType -----------
