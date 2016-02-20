@@ -2,6 +2,8 @@ Pojot
 =====
 Provides test coverage of methods such as basic getters and setters, equals and hashcode testing, and enums.
 
+[![Circle CI](https://circleci.com/gh/danhagberg/pojot.svg?style=svg)](https://circleci.com/gh/danhagberg/pojot)
+
 Features
 --------
 * Tests getters/setters using range of values as applicable for type: min, max, null.
