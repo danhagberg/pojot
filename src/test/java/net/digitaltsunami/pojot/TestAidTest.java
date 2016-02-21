@@ -4,6 +4,7 @@ import net.digitaltunami.pojot.testsubject.EqualsHashTestClass;
 import net.digitaltunami.pojot.testsubject.SimpleClass;
 import org.testng.annotations.Test;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.util.List;
 import java.util.Set;
@@ -15,6 +16,13 @@ import static org.testng.Assert.assertTrue;
  * Created by dhagberg on 1/16/16.
  */
 public class TestAidTest {
+    public void testx() throws IntrospectionException {
+
+        List<String> errors = new TestAid<SimpleClass>(SimpleClass.class)
+                .excludeFields("specialProp1", "specialProp2")
+                .excludeSetters("propWithSetterLogic")
+                .validate();
+    }
 
     @Test
     public void testGetFieldsToCheckAllFields() throws Exception {
@@ -105,6 +113,16 @@ public class TestAidTest {
     }
 
     @Test
+    public void testSetIncludeInEqualsButExcluded() throws Exception {
+        TestAid ta = new TestAid(EqualsHashTestClass.class);
+        String[] fields = EqualsHashTestClass.getFieldsInEquals().toArray(new String[]{});
+        ta.excludeFields(fields);
+        ta.includeInEquals(fields);
+        List<String> errors = ta.runEqualsTests();
+        assertTrue(errors.size() == 0, errors.toString());
+    }
+
+    @Test
     public void testSetIncludeInEqualsNegativeTest() throws Exception {
         TestAid ta = new TestAid(EqualsHashTestClass.class);
         ta.includeInEquals(EqualsHashTestClass.getFieldsNotInEquals().toArray(new String[]{}));
@@ -116,6 +134,15 @@ public class TestAidTest {
     public void testSetIncludeInEqualsHashCode() throws Exception {
         TestAid ta = new TestAid(EqualsHashTestClass.class);
         ta.includeInEquals(EqualsHashTestClass.getFieldsInEquals().toArray(new String[]{}));
+        List<String> errors = ta.runHashTests();
+        assertTrue(errors.size() == 0, errors.toString());
+    }
+    @Test
+    public void testSetIncludeInEqualsHashCodeButExcluded() throws Exception {
+        TestAid ta = new TestAid(EqualsHashTestClass.class);
+        String[] fields = EqualsHashTestClass.getFieldsInEquals().toArray(new String[]{});
+        ta.excludeFields(fields);
+        ta.includeInEquals(fields);
         List<String> errors = ta.runHashTests();
         assertTrue(errors.size() == 0, errors.toString());
     }

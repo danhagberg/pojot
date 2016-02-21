@@ -3,6 +3,10 @@ package net.digitaltsunami.pojot.property;
 import net.digitaltsunami.pojot.TestAidException;
 
 /**
+ * Generic property for all classes not already represented by the basic types.  Will create an empty instance used
+ * to populate property values.
+ * <p>
+ * The provided class must have a zero argument constructor so that a default instance can be created for testing.
  * Created by dhagberg on 1/31/16.
  */
 public class GenericProperty implements PropertyValue {
@@ -54,10 +58,9 @@ public class GenericProperty implements PropertyValue {
 
 
     /**
-     * Return a null value for the type. Primitive types should throw an UnsupportedOperationException
+     * Return a null value for the type.
      *
      * @return null unconditionally
-     * @throws UnsupportedOperationException
      */
     @Override
     public Object getDefaultValue() {
