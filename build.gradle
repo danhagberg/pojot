@@ -1,6 +1,18 @@
+buildscript {
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
+    }
+  }
+  dependencies {
+    classpath 'net.researchgate:gradle-release:2.3.4'
+  }
+}
+
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'signing'
+apply plugin: 'net.researchgate.release'
 
 group 'net.digitaltsunami'
 archivesBaseName = 'pojot'
