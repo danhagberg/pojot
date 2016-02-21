@@ -4,6 +4,8 @@ Provides test coverage of methods such as basic getters and setters, equals and 
 
 [![Circle CI](https://circleci.com/gh/danhagberg/pojot.svg?style=svg)](https://circleci.com/gh/danhagberg/pojot)
 
+[Javadocs](http://digitaltsunami.net/projects/pojot/site/apidocs/index.html)
+
 Features
 --------
 * Tests getters/setters using range of values as applicable for type: min, max, null.
