@@ -33,10 +33,9 @@ public class StringVal implements PropertyValue {
     }
 
     /**
-     * Return a null value for the type. Primitive types should throw an UnsupportedOperationException
+     * Return a null value for the type.
      *
      * @return null unconditionally
-     * @throws UnsupportedOperationException
      */
     @Override
     public Object getDefaultValue() {
