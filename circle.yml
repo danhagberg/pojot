@@ -2,7 +2,7 @@ machine:
     java:
         version: oraclejdk8
 test:
-  overide:
+  override:
     - ./gradlew clean test jacocoTestReport
 
   post:
