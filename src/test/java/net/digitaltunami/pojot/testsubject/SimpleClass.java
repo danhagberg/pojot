@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by dhagberg on 1/16/16.
@@ -23,12 +24,11 @@ public class SimpleClass extends BasicClass {
     }
 
     public static int getNumberOfFields() {
-        System.out.println(getFieldNames());
-        return getFieldNames().size();
+        return 5;
     }
     public static List<String> getFieldNames() {
-         return Arrays.stream(SimpleClass.class.getDeclaredFields())
-                 .map(field -> field.getName())
+        // Cant use reflection. When running under jacoco, it adds an additional field for internal use.
+        return Stream.of("testString0", "startDate", "testInteger1", "testInt2", "otherClass")
                  .collect(Collectors.toList());
     }
 
