@@ -13,7 +13,7 @@ public class BooleanVal implements PropertyValue {
 
     @Override
     public Object getLargeValue() {
-        return Boolean.TRUE;
+        return Boolean.FALSE;
     }
 
     /**
