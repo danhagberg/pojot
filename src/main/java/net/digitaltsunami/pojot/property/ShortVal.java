@@ -3,7 +3,7 @@ package net.digitaltsunami.pojot.property;
 public class ShortVal implements PropertyValue {
     @Override
     public Object getValue() {
-        return Short.valueOf((short) 290);
+        return Short.valueOf(ByteNumberGenerator.getNextNumber());
     }
 
     @Override

@@ -1,9 +1,10 @@
 package net.digitaltsunami.pojot.property;
 
 public class DoubleVal implements PropertyValue {
+
     @Override
     public Object getValue() {
-        return Double.valueOf(11.2);
+        return Double.valueOf(ByteNumberGenerator.getNextNumber() + .1111);
     }
 
     @Override
