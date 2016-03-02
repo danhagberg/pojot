@@ -2,7 +2,7 @@ Pojot
 =====
 Provides test coverage of methods such as basic getters and setters, equals and hashcode testing, and enums.
 
-[![Circle CI](https://circleci.com/gh/danhagberg/pojot.svg?style=svg)](https://circleci.com/gh/danhagberg/pojot)
+[![Circle CI](https://circleci.com/gh/danhagberg/pojot.svg?style=svg&circle-token=e554fafca069e81e8ce2c9c2ff2fa2bfce82d1b3)](https://circleci.com/gh/danhagberg/pojot) [![Download](https://api.bintray.com/packages/danhagberg/maven/pojot/images/download.svg) ](https://bintray.com/danhagberg/maven/pojot/_latestVersion)
 
 [Javadocs](http://digitaltsunami.net/projects/pojot/site/apidocs/index.html)
 

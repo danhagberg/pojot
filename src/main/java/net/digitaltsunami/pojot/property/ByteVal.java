@@ -3,7 +3,7 @@ package net.digitaltsunami.pojot.property;
 public class ByteVal implements PropertyValue {
     @Override
     public Object getValue() {
-        return Byte.valueOf((byte) 52);
+        return Byte.valueOf(ByteNumberGenerator.getNextNumber());
     }
 
     @Override

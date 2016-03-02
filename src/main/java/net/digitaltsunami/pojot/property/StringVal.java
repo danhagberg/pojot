@@ -19,7 +19,7 @@ public class StringVal implements PropertyValue {
 
     @Override
     public Object getValue() {
-        return "Test String Value";
+        return StringGenerator.getNextString(20);
     }
 
     @Override

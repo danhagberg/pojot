@@ -4,7 +4,7 @@ public class IntegerVal implements PropertyValue {
 
     @Override
     public Object getValue() {
-        return Integer.valueOf(10);
+        return Integer.valueOf(ByteNumberGenerator.getNextNumber());
     }
 
     @Override

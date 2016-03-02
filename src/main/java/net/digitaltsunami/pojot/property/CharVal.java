@@ -3,7 +3,7 @@ package net.digitaltsunami.pojot.property;
 public class CharVal implements PropertyValue {
     @Override
     public Object getValue() {
-        return Character.valueOf('a');
+        return Character.valueOf(StringGenerator.getNextChar());
     }
 
     @Override

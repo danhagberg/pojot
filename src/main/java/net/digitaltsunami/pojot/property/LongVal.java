@@ -2,7 +2,7 @@ package net.digitaltsunami.pojot.property;
 public class LongVal implements PropertyValue {
     @Override
     public Long getValue() {
-        return 42L;
+        return Long.valueOf(ByteNumberGenerator.getNextNumber());
     }
 
     @Override
