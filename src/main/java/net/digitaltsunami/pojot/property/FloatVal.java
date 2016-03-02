@@ -4,7 +4,7 @@ public class FloatVal implements PropertyValue {
 
     @Override
     public Object getValue() {
-        return Float.valueOf(ByteNumberGenerator.getNextNumber() + .1111F);
+        return Float.valueOf(ByteNumberGenerator.getNextNumber() + .4242F);
     }
 
     @Override

@@ -15,7 +15,6 @@ public class StringGenerator {
 
     public static String getNextString(int size) {
         int bIdx = index.getAndIncrement();
-        int obidx = bIdx;
         StringBuilder value = new StringBuilder(size);
 
         int pe = bIdx + size;
@@ -26,28 +25,23 @@ public class StringGenerator {
         else if (pe > DATA_LEN) {
             value.append(DATA.substring(bIdx, DATA_LEN));
             int remaining = size - (DATA_LEN - bIdx);
-            bIdx = 0;
             int multiples = remaining / DATA_LEN;
             for (int i = 0; i < multiples; i++) {
                 value.append(DATA.substring(bIdx));
-                bIdx = 0;
             }
             value.append(DATA.substring(0, remaining % DATA_LEN));
         }
-        else {
+        else { // pe == DATA_LEN
             value.append(DATA.substring(bIdx, DATA_LEN));
         }
-
-        /*
-        System.out.printf("b=%d s=%d e=%d p=%d %n", bIdx, size, eIdx, psuedoEnd );
-        */
-        System.out.printf("b=%d s=%d p=%d %s %n", obidx, size, pe, value.toString());
-        System.out.println();
-
 
         return value.toString();
     }
 
+    /**
+     * Return the next character in the sequence.
+     * @return non-null and non-empty Character value
+     */
     public static Character getNextChar() {
         return DATA.charAt(index.getAndIncrement());
     }
