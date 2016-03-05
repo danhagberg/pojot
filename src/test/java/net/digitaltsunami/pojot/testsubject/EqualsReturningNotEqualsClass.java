@@ -1,14 +1,13 @@
-package net.digitaltunami.pojot.testsubject;
+package net.digitaltsunami.pojot.testsubject;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Fields are in hashcode and equals, but no getter or setters so no property values returned for the bean.
- * This class is used to test for failure as it initializes the value to a different value for each instance.
+ *
  */
-public class EqualsReturningNotEqualsDefaultValuesClass {
+public class EqualsReturningNotEqualsClass {
     private static final AtomicInteger valGen = new AtomicInteger(1);
     private static Set<String> fieldsInEquals;
 
@@ -19,10 +18,6 @@ public class EqualsReturningNotEqualsDefaultValuesClass {
 
     private long testVal;
 
-    public EqualsReturningNotEqualsDefaultValuesClass() {
-        this.testVal = valGen.incrementAndGet();
-    }
-
     public static Set<String> getFieldsInEqualsCode() {
         return fieldsInEquals;
     }
@@ -30,9 +25,9 @@ public class EqualsReturningNotEqualsDefaultValuesClass {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EqualsReturningNotEqualsDefaultValuesClass)) return false;
+        if (!(o instanceof EqualsReturningNotEqualsClass)) return false;
 
-        EqualsReturningNotEqualsDefaultValuesClass that = (EqualsReturningNotEqualsDefaultValuesClass) o;
+        EqualsReturningNotEqualsClass that = (EqualsReturningNotEqualsClass) o;
 
         return testVal == that.testVal;
 
@@ -41,5 +36,12 @@ public class EqualsReturningNotEqualsDefaultValuesClass {
     @Override
     public int hashCode() {
         return (int) (testVal ^ (testVal >>> 32));
+    }
+
+    public long getTestVal() {
+        return this.testVal;
+    }
+    public void setTestVal(long newVal) {
+        this.testVal = valGen.incrementAndGet();
     }
 }

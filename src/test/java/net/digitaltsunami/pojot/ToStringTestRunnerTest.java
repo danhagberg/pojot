@@ -1,7 +1,7 @@
 package net.digitaltsunami.pojot;
 
-import net.digitaltunami.pojot.testsubject.BadToStringClass;
-import net.digitaltunami.pojot.testsubject.SimpleClass;
+import net.digitaltsunami.pojot.testsubject.BadToStringClass;
+import net.digitaltsunami.pojot.testsubject.SimpleClass;
 import org.testng.annotations.Test;
 
 import java.beans.BeanInfo;
