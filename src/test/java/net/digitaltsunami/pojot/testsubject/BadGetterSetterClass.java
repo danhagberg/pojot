@@ -1,4 +1,4 @@
-package net.digitaltunami.pojot.testsubject;
+package net.digitaltsunami.pojot.testsubject;
 
 import java.util.Set;
 import java.util.stream.Collectors;

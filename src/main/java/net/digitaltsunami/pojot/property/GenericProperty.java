@@ -11,10 +11,17 @@ import net.digitaltsunami.pojot.TestAidException;
  */
 public class GenericProperty implements PropertyValue {
     Object property;
+    private String type;
+
     public GenericProperty(String type) {
+        this.type = type;
+        property = createInstance();
+    }
+
+    private Object createInstance() {
         try {
             Class clazz = Class.forName(type);
-            property = clazz.newInstance();
+            return clazz.newInstance();
         } catch ( ClassNotFoundException
                 | InstantiationException
                 | IllegalAccessException e) {
@@ -29,7 +36,7 @@ public class GenericProperty implements PropertyValue {
      */
     @Override
     public Object getValue() {
-        return property;
+        return createInstance();
     }
 
     /**
@@ -41,7 +48,7 @@ public class GenericProperty implements PropertyValue {
      */
     @Override
     public Object getSmallValue() {
-        return property;
+        return createInstance();
     }
 
     /**

@@ -1,4 +1,4 @@
-package net.digitaltunami.pojot.testsubject;
+package net.digitaltsunami.pojot.testsubject;
 
 /**
  * Created by dhagberg on 2/1/16.

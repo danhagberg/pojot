@@ -1,7 +1,8 @@
 package net.digitaltsunami.pojot;
 
-import net.digitaltunami.pojot.testsubject.EqualsHashTestClass;
-import net.digitaltunami.pojot.testsubject.SimpleClass;
+import net.digitaltsunami.pojot.testsubject.EqualsHashAllFieldsTestClass;
+import net.digitaltsunami.pojot.testsubject.EqualsHashTestClass;
+import net.digitaltsunami.pojot.testsubject.SimpleClass;
 import org.testng.annotations.Test;
 
 import java.beans.IntrospectionException;
@@ -113,6 +114,22 @@ public class TestAidTest {
     }
 
     @Test
+    public void testSetIncludeAllInEquals() throws Exception {
+        TestAid ta = new TestAid(EqualsHashAllFieldsTestClass.class);
+        ta.includeAllInEquals();
+        List<String> errors = ta.runEqualsTests();
+        assertTrue(errors.size() == 0, errors.toString());
+    }
+
+    @Test
+    public void testSetExcludeFromEquals() throws Exception {
+        TestAid ta = new TestAid(EqualsHashTestClass.class);
+        ta.excludeFromEquals(EqualsHashTestClass.getFieldsNotInEquals().toArray(new String[]{}));
+        List<String> errors = ta.runEqualsTests();
+        assertTrue(errors.size() == 0, errors.toString());
+    }
+
+    @Test
     public void testSetIncludeInEqualsButExcluded() throws Exception {
         TestAid ta = new TestAid(EqualsHashTestClass.class);
         String[] fields = EqualsHashTestClass.getFieldsInEquals().toArray(new String[]{});
@@ -134,6 +151,22 @@ public class TestAidTest {
     public void testSetIncludeInEqualsHashCode() throws Exception {
         TestAid ta = new TestAid(EqualsHashTestClass.class);
         ta.includeInEquals(EqualsHashTestClass.getFieldsInEquals().toArray(new String[]{}));
+        List<String> errors = ta.runHashTests();
+        assertTrue(errors.size() == 0, errors.toString());
+    }
+
+    @Test
+    public void testSetIncludeAllInEqualsHashCode() throws Exception {
+        TestAid ta = new TestAid(EqualsHashAllFieldsTestClass.class);
+        ta.includeAllInEquals();
+        List<String> errors = ta.runHashTests();
+        assertTrue(errors.size() == 0, errors.toString());
+    }
+
+    @Test
+    public void testSetExcludeFromEqualsHashCode() throws Exception {
+        TestAid ta = new TestAid(EqualsHashTestClass.class);
+        ta.excludeFromEquals(EqualsHashTestClass.getFieldsNotInEquals().toArray(new String[]{}));
         List<String> errors = ta.runHashTests();
         assertTrue(errors.size() == 0, errors.toString());
     }

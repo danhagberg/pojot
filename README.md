@@ -25,7 +25,7 @@ Assumptions
 Usage
 -----
 Basic usage is to create an instance of TestAid for the class under test and invoke the validate method.
-This will return a set of 0 to many errors found during validation, with each error string providing 
+This will return a set of 0 to many errors found during validation, with each error string providing
  information on the test that failed.
  
 ``` java
@@ -54,12 +54,38 @@ public void testBasicMethodsForClassUnderTest() throws IntrospectionException {
 ```
 
 ### Providing fields for equals/hashcode testing. 
-Providing fields for equality testing will ensure that the equality changes as the field values change.
+Providing fields for equality testing will ensure that the equality changes as the field values change.  
+There are currently three ways to provide fields names: include all, include a set, or exclude a set.  
+If field names are not provided using one of those methods, then the equality
+testing will be assumed to use the default methods. 
+
+*Note that final fields will not be included as they cannot be changed during testing.*
+#### Include a subset of fields
 ``` java
 @Test
 public void testBasicOrderMethods() throws IntrospectionException {
     TestAid<Order> ta = new TestAid<>(Order.class);
     ta.includeInEquals( "customerId", "orderNumber");
+    List<String> errors = ta.validate();
+    assertTrue(errors.toString(), errors.isEmpty());
+}
+```
+#### Include all fields
+``` java
+@Test
+public void testBasicOrderMethods() throws IntrospectionException {
+    TestAid<Order> ta = new TestAid<>(Order.class);
+    ta.includeAllInEquals();
+    List<String> errors = ta.validate();
+    assertTrue(errors.toString(), errors.isEmpty());
+}
+```
+##### Exclude a subset of fields. All others will be included.
+``` java
+@Test
+public void testBasicOrderMethods() throws IntrospectionException {
+    TestAid<Order> ta = new TestAid<>(Order.class);
+    ta.excludeFromEquals( "customerComments");
     List<String> errors = ta.validate();
     assertTrue(errors.toString(), errors.isEmpty());
 }

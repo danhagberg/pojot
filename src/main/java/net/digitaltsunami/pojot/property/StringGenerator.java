@@ -13,7 +13,7 @@ public class StringGenerator {
     private static final AtomicInteger index = new AtomicInteger(0);
 
     /**
-     * Create and return a string of length size.  If size is < 1, then
+     * Create and return a string of length size.  If size is less than 1, then
      * an empty string will be returned.
      *
      * @param size Non-negative number of characters to return.

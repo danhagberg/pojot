@@ -1,6 +1,6 @@
 package net.digitaltsunami.pojot;
 
-import net.digitaltunami.pojot.testsubject.*;
+import net.digitaltsunami.pojot.testsubject.*;
 import org.testng.annotations.Test;
 
 import java.beans.BeanInfo;
