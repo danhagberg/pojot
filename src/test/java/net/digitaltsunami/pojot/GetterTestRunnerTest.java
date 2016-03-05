@@ -1,9 +1,9 @@
 package net.digitaltsunami.pojot;
 
-import net.digitaltunami.pojot.testsubject.BadGetterSetterClass;
-import net.digitaltunami.pojot.testsubject.BasicClass;
-import net.digitaltunami.pojot.testsubject.ModifiedGetterSetterClass;
-import net.digitaltunami.pojot.testsubject.SimpleClass;
+import net.digitaltsunami.pojot.testsubject.BadGetterSetterClass;
+import net.digitaltsunami.pojot.testsubject.BasicClass;
+import net.digitaltsunami.pojot.testsubject.ModifiedGetterSetterClass;
+import net.digitaltsunami.pojot.testsubject.SimpleClass;
 import org.testng.annotations.Test;
 
 import java.beans.BeanInfo;

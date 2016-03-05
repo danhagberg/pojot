@@ -1,4 +1,4 @@
-package net.digitaltunami.pojot.testsubject;
+package net.digitaltsunami.pojot.testsubject;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -17,8 +17,8 @@ public class EqualsHashTestClass {
     private Date testNotIncludedDate;
     private int testNotIncludedInt;
 
-    private static Set<String> fieldsInEquals;
-    private static Set<String> fieldsNotInEquals;
+    private final static Set<String> fieldsInEquals;
+    private final static Set<String> fieldsNotInEquals;
 
     static {
         fieldsInEquals = new HashSet<String>();
@@ -29,6 +29,8 @@ public class EqualsHashTestClass {
         fieldsNotInEquals = new HashSet<String>();
         fieldsNotInEquals.add("testNotIncludedDate");
         fieldsNotInEquals.add("testNotIncludedInt");
+        //fieldsNotInEquals.add("fieldsInEquals");
+        //fieldsNotInEquals.add("fieldsNotInEquals");
     };
 
     public static Set<String> getFieldsInEquals() {

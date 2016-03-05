@@ -1,6 +1,6 @@
 package net.digitaltsunami.pojot;
 
-import net.digitaltunami.pojot.testsubject.TypesClass;
+import net.digitaltsunami.pojot.testsubject.TypesClass;
 import org.testng.annotations.Test;
 
 import java.beans.IntrospectionException;

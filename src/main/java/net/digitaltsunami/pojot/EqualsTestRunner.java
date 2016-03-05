@@ -7,7 +7,6 @@ import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -22,9 +21,7 @@ import java.util.stream.Collectors;
  * Currently, there is no check to ensure that the list of fields provided is all inclusive.  If a field not provided
  * has an effect on the equals method, then this will not be found.
  */
-public class EqualsTestRunner<T> extends AbstractTestRunner<T> {
-
-    private final Set<String> includeInEquals;
+public class EqualsTestRunner<T> extends AbstractEqualityTestRunner<T> {
 
     /**
      * Create a test runner for the class under test that includes no special logic to determine equality.
@@ -45,27 +42,7 @@ public class EqualsTestRunner<T> extends AbstractTestRunner<T> {
      * @param includeInEquals names of properties that are used to compare equality.
      */
     public EqualsTestRunner(Class clazz, BeanInfo beanInfo, Set<String> includeInEquals) {
-        super(clazz, beanInfo);
-        this.includeInEquals = includeInEquals;
-    }
-
-    @Override
-    public List<String> runTests() {
-        final List<String> errors = new ArrayList<>();
-        try {
-            if (includeInEquals.isEmpty()) {
-                errors.addAll(runSimpleTest());
-            } else {
-                errors.addAll(runCombinationTest());
-            }
-        } catch (InstantiationException
-                | NoSuchFieldException
-                | NoSuchMethodException
-                | InvocationTargetException
-                | IllegalAccessException e) {
-            throw new TestAidException("Equals test failed", e);
-        }
-        return errors;
+        super(clazz, beanInfo, includeInEquals);
     }
 
     /**
@@ -73,16 +50,20 @@ public class EqualsTestRunner<T> extends AbstractTestRunner<T> {
      * field were provided, then an instance is equal to another instance IFF they are the same instance (==).
      *
      * @return List containing an error message if the test failed or empty if the test passed.
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     * @throws TestAidException if unable to properly execute the task.
      */
-    private List<String> runSimpleTest() throws IllegalAccessException, InstantiationException {
+    protected List<String> runSimpleTest() {
         final List<String> errors = new ArrayList<>();
-        final T instanceOne = (T) clazz.newInstance();
-        final T instanceTwo = (T) clazz.newInstance();
-        if (instanceOne.equals(instanceTwo)) {
-            errors.add(String.format("Equals method test failed for %s.  Expected %s but was %s",
-                    getClassName(), Boolean.FALSE, Boolean.TRUE));
+        final T instanceOne;
+        try {
+            instanceOne = (T) clazz.newInstance();
+            final T instanceTwo = (T) clazz.newInstance();
+            if (instanceOne.equals(instanceTwo)) {
+                errors.add(String.format("Equals method test failed for %s.  No fields provided, so default equals (==) expected, but equals method depended on fields.", getClassName()));
+            }
+        } catch (InstantiationException
+                | IllegalAccessException e) {
+            throw new TestAidException("Unable to complete Equals test due to reflection error.", e);
         }
         return errors;
     }
@@ -93,72 +74,57 @@ public class EqualsTestRunner<T> extends AbstractTestRunner<T> {
      *
      * @return List containing an error message if the test failed or empty if the test passed.
      */
-    private List<String> runCombinationTest()
-            throws IllegalAccessException, InstantiationException, NoSuchFieldException,
-            InvocationTargetException, NoSuchMethodException {
+    protected List<String> runCombinationTest() {
 
         final List<String> errors = new ArrayList<>();
-        final T instanceOne = (T) clazz.newInstance();
-        final T instanceTwo = (T) clazz.newInstance();
+        try {
+            final T instanceOne = (T) clazz.newInstance();
+            final T instanceTwo = (T) clazz.newInstance();
 
-        // First test with default values in all properties
-        if (!instanceOne.equals(instanceTwo)) {
-            errors.add(String.format("Equals method test failed for %s.  Two instances with default values should be equal.",
-                    getClassName()));
-        }
-
-        Map<String, PropertyDescriptor> descriptorMap =
-                Arrays.stream(beanInfo.getPropertyDescriptors())
-                        .collect(Collectors.toMap(pd -> pd.getName(), Function.identity()));
-        for (String fieldName : includeInEquals) {
-            PropertyDescriptor property = descriptorMap.get(fieldName);
-            Field field = clazz.getDeclaredField(fieldName);
-            Class<?> fieldType = field.getType();
-
-            PropertyValue val = PropertyValues.fromString(fieldType.getCanonicalName());
-            Object testVal = val.getValue();
-            // Set both instances to have the same value.
-            setFieldVal(instanceOne, property, field, testVal);
-            setFieldVal(instanceTwo, property, field, testVal);
-
+            // First test with default values in all properties
             if (!instanceOne.equals(instanceTwo)) {
-                errors.add(String.format("Equals method test failed for %s. Equal values in %s caused the instances to no longer be equal.",
-                        getClassName(), property.getDisplayName()));
-                break;
-            } else {
-                setFieldVal(instanceTwo, property, field, val.getLargeValue());
-                if (instanceOne.equals(instanceTwo)) {
-                    errors.add(String.format("Equals method test failed for %s.  Non-equal values in %s did not cause inequality for instances.",
-                            getClassName(), property.getDisplayName()));
-                    break;
-                }
-                // Reset instance two value as it passed the test.
-                setFieldVal(instanceTwo, property, field, testVal);
+                errors.add(String.format("Equals method test failed for %s.  Two instances with default values should be equal.",
+                        getClassName()));
             }
+
+            Map<String, PropertyDescriptor> descriptorMap =
+                    Arrays.stream(beanInfo.getPropertyDescriptors())
+                            .collect(Collectors.toMap(pd -> pd.getName(), Function.identity()));
+            for (String fieldName : includeInEquals) {
+                PropertyDescriptor property = descriptorMap.get(fieldName);
+                Field field = clazz.getDeclaredField(fieldName);
+                Class<?> fieldType = field.getType();
+
+                PropertyValue val = PropertyValues.fromString(fieldType.getCanonicalName());
+                Object testVal = val.getValue();
+                // Set both instances to have the same value.
+                setFieldVal(instanceOne, property, field, testVal);
+                setFieldVal(instanceTwo, property, field, testVal);
+
+                if (!instanceOne.equals(instanceTwo)) {
+                    errors.add(String.format("Equals method test failed for %s. Equal values in %s caused the instances to no longer be equal.",
+                            getClassName(), fieldName));
+                    break;
+                } else {
+                    setFieldVal(instanceTwo, property, field, val.getLargeValue());
+                    if (instanceOne.equals(instanceTwo)) {
+                        errors.add(String.format("Equals method test failed for %s.  Non-equal values in %s did not cause inequality for instances.",
+                                getClassName(), fieldName));
+                        break;
+                    }
+                    // Reset instance two value as it passed the test.
+                    setFieldVal(instanceTwo, property, field, testVal);
+                }
+            }
+        } catch (InstantiationException
+                | IllegalAccessException
+                | InvocationTargetException
+                | NoSuchFieldException e) {
+            throw new TestAidException("Unable to complete Equals test due to reflection error.", e);
         }
+
 
         return errors;
     }
 
-    /**
-     * Set the value using the setter if present, otherwise directly.
-     *
-     * @param instance Instance of class under test to operate on.
-     * @param property Property being tested
-     * @param field    Field being tested
-     * @param testVal  Test value to use.
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     */
-    private void setFieldVal(T instance, PropertyDescriptor property, Field field, Object
-            testVal) throws InvocationTargetException, IllegalAccessException {
-
-        Method setter = (property == null) ? null : property.getWriteMethod();
-        if (setter != null) {
-            setter.invoke(instance, testVal);
-        } else {
-            field.setAccessible(true);
-            field.set(instance, testVal);
-        }
-    }
 }

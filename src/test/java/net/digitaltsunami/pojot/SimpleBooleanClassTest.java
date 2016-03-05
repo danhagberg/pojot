@@ -1,7 +1,6 @@
 package net.digitaltsunami.pojot;
 
-import net.digitaltunami.pojot.testsubject.ClassWithBoolean;
-import net.digitaltunami.pojot.testsubject.SimpleClass;
+import net.digitaltsunami.pojot.testsubject.ClassWithBoolean;
 import org.testng.annotations.Test;
 
 import java.beans.IntrospectionException;

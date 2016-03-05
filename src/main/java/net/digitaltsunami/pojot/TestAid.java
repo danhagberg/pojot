@@ -1,6 +1,8 @@
 package net.digitaltsunami.pojot;
 
 import java.beans.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,6 +66,8 @@ public class TestAid<T> {
     private final HashSet<String> includeSetters = new HashSet<>();
     private final HashSet<String> excludeSetters = new HashSet<>();
     private final HashSet<String> includeInEquals = new HashSet<>();
+    private final HashSet<String> excludeFromEquals = new HashSet<>();
+    private boolean includeAllInEquals;
 
     /**
      * Create a test aid for the provided class.
@@ -190,17 +194,62 @@ public class TestAid<T> {
      * Set of fields that are used to test equality and hashCode logic of the class under test.
      * <p>
      * NOTE: The that the default set of fields is empty. Equals and hashCode testing will be performed only if
-     * this set includes at least one field.
+     * this set includes at least one field added by invocation of this or one of the the other methods mentioned below.
      * <p>
      * These fields are not affected by the include/exclude fields filters and will be tested using
      * values allowable for the type and nulls where applicable.
+     * <p>
+     * If all fields are to be included, use {@link #includeAllInEquals()}.
+     * If the number of fields being included represents the majority, but not all of the fields, then it may
+     * be better to use {@link #excludeFromEquals(String...)}.
      * @param fields Names of fields to use in equality testing.
      *
      * @return Current instance to allow fluent invocation.
+     * @see #excludeFromEquals(String...)
+     * @see #includeAllInEquals()
      */
     public TestAid<T> includeInEquals(String... fields) {
         for (String field : fields) {
             includeInEquals.add(field);
+        }
+        return this;
+    }
+
+    /**
+     * Include all fields in the set of fields used to test equality and hashCode logic of the class under test.
+     * <p>
+     * NOTE: The that the default set of fields is empty. Equals and hashCode testing will be performed only if
+     * this set includes at least one field added by invocation of this or one of the the other methods mentioned below.
+     * <p>
+     * These fields are not affected by the include/exclude fields filters and will be tested using
+     * values allowable for the type and nulls where applicable.
+     *
+     * @return Current instance to allow fluent invocation.
+     * @see #excludeFromEquals(String...)
+     * @see #includeInEquals(String...)
+     */
+    public TestAid<T> includeAllInEquals() {
+        this.includeAllInEquals = true;
+        return this;
+    }
+
+    /**
+     * Exclude a set of fields from being used to test equality and hashCode logic.  If this method is invoked,
+     *  then all other fields are included.  Excluding a field will override including the field.
+     * <p>
+     * These fields are not affected by the include/exclude fields filters and will be tested using
+     * values allowable for the type and nulls where applicable.
+     * <p>
+     * If the number of fields being excluded represents the majority of the fields, then it may be better to use
+     * {@link #includeInEquals(String...)}.
+     * @param fields Names of fields to exclude from processing.
+     * @return Current instance to allow fluent invocation.
+     * @see #includeInEquals(String...)
+     * @see #includeAllInEquals()
+     */
+    public TestAid<T> excludeFromEquals(String... fields) {
+        for (String field : fields) {
+            excludeFromEquals.add(field);
         }
         return this;
     }
@@ -261,15 +310,20 @@ public class TestAid<T> {
     /**
      * Run equals tests on class under test if applicable. Test will be run on
      * the equals method only if declared within the class under test.
-     * Fields used to determine equality are those provided in the #includeInEquals method.
+     * Fields used to determine equality are those provided by invocation of one of the setup methods
+     * mentioned below.
      * Included fields will be tested with all combinations of non-null and if applicable, null values.
      * Only those fields will be used and other fields may contain random data.
      * @return List of zero to many errors found during the run.
+     * @see #includeInEquals(String...)
+     * @see #includeAllInEquals()
+     * @see #excludeFromEquals(String...)
      */
     public List<String> runEqualsTests() {
         final List<String> errors = new ArrayList<>();
         if (beanMethodsMap.containsKey("equals")) {
-            errors.addAll(new EqualsTestRunner<T>(clazz, beanInfo, includeInEquals).runTests());
+            Set<String> includedFields = filterEqualsFields(includeInEquals, excludeFromEquals);
+            errors.addAll(new EqualsTestRunner<T>(clazz, beanInfo, includedFields).runTests());
         }
         return errors;
     }
@@ -277,15 +331,20 @@ public class TestAid<T> {
     /**
      * Run hashCode tests on class under test if applicable. Test will be run on
      * the hashCode method only if declared within the class under test.
-     * Fields used to determine equality are those provided in the #includeInEquals method.
+     * Fields used to determine equality are those provided by invocation of one of the setup methods
+     * mentioned below.
      * Included fields will be tested with all combinations of non-null and if applicable, null values.
      * Only those fields will be used and other fields may contain random data.
      * @return List of zero to many errors found during the run.
+     * @see #includeInEquals(String...)
+     * @see #includeAllInEquals()
+     * @see #excludeFromEquals(String...)
      */
     public List<String> runHashTests() {
         final List<String> errors = new ArrayList<>();
         if (beanMethodsMap.containsKey("hashCode")) {
-            errors.addAll(new HashcodeTestRunner<T>(clazz, beanInfo, includeInEquals).runTests());
+            Set<String> includedFields = filterEqualsFields(includeInEquals, excludeFromEquals);
+            errors.addAll(new HashcodeTestRunner<T>(clazz, beanInfo, includedFields).runTests());
         }
         return errors;
     }
@@ -356,6 +415,46 @@ public class TestAid<T> {
             return getFieldsToCheck().stream()
                     .filter(field -> include.contains(field.getName()))
                     .filter(field -> !exclude.contains(field.getName()))
+                    .collect(Collectors.toSet());
+        }
+    }
+
+    /**
+     * Return the set of property names that have been selected for equality/hashCode testing.
+     * If {@link #includeAllInEquals()} was invoked, then all fields are included and no further
+     * filtering will be applied.
+     * Otherwise this set is filtered as follows:
+     * <ul>
+     * <li>Intersection of included fields set if specified</li>
+     * <li>Remaining fields minus excluded fields set</li>
+     * </ul>
+     *
+     * @param include set of property names to include when selecting methods
+     * @param exclude set of property names to exclude when selecting methods
+     * @return Set of property names that may be empty.
+     */
+    protected Set<String> filterEqualsFields(Set<String> include, Set<String> exclude) {
+        if (!includeAllInEquals && includeInEquals.isEmpty() && excludeFromEquals.isEmpty()) {
+            return Collections.emptySet();
+        }
+        Field[] properties = clazz.getDeclaredFields();
+        if (includeAllInEquals) {
+            return Arrays.stream(properties)
+                    .filter(field -> !Modifier.isFinal(field.getModifiers()))
+                    .map(property -> property.getName())
+                    .collect(Collectors.toSet());
+        } else if (include.isEmpty()) {
+            return Arrays.stream(properties)
+                    .filter(field -> !exclude.contains(field.getName()))
+                    .filter(field -> !Modifier.isFinal(field.getModifiers()))
+                    .map(field -> field.getName())
+                    .collect(Collectors.toSet());
+        } else {
+            return Arrays.stream(properties)
+                    .filter(field -> include.contains(field.getName()))
+                    .filter(field -> !exclude.contains(field.getName()))
+                    .filter(field -> !Modifier.isFinal(field.getModifiers()))
+                    .map(field -> field.getName())
                     .collect(Collectors.toSet());
         }
     }

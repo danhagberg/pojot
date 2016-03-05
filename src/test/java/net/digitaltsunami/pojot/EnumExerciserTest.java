@@ -1,6 +1,6 @@
 package net.digitaltsunami.pojot;
 
-import net.digitaltunami.pojot.testsubject.TestEnum;
+import net.digitaltsunami.pojot.testsubject.TestEnum;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertTrue;
