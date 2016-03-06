@@ -1,8 +1,6 @@
 package net.digitaltsunami.pojot.property;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Set of values to place into a property for testing.  Each is identified by type Integer, int, String, etc.
@@ -26,7 +24,10 @@ public enum PropertyValues {
     LongPropVal(Long.class.getCanonicalName(), new LongVal()),
     ShortPropPrimitiveVal("short", new ShortPrimitiveVal()),
     ShortPropVal(Short.class.getCanonicalName(), new ShortVal()),
-    StringPropVal(String.class.getCanonicalName(), new StringVal())
+    StringPropVal(String.class.getCanonicalName(), new StringVal()),
+    SetsPropVal(Set.class.getCanonicalName(), new SetVal()),
+    MapPropVal(Map.class.getCanonicalName(), new MapVal()),
+    ListPropVal(List.class.getCanonicalName(), new ListVal())
    ;
 
 
