@@ -1,5 +1,6 @@
 package net.digitaltsunami.pojot.property;
 
+import java.util.Collections;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -28,7 +29,7 @@ public class SetVal implements PropertyValue {
      */
     @Override
     public Object getSmallValue() {
-        return Stream.of().collect(toSet());
+        return Collections.EMPTY_SET;
     }
 
     /**
