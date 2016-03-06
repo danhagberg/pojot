@@ -1,7 +1,11 @@
 package net.digitaltsunami.pojot.property;
 
+import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by dhagberg on 3/5/16.
@@ -14,7 +18,7 @@ public class ListVal implements PropertyValue {
      */
     @Override
     public Object getValue() {
-        return Stream.of(1,2,3).collect(Collectors.toList());
+        return Stream.of(1,2,3).collect(toList());
     }
 
     /**
@@ -26,7 +30,7 @@ public class ListVal implements PropertyValue {
      */
     @Override
     public Object getSmallValue() {
-        return Stream.of().collect(Collectors.toList());
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -38,7 +42,7 @@ public class ListVal implements PropertyValue {
      */
     @Override
     public Object getLargeValue() {
-        return Stream.of(1,2,3,4,5,6).collect(Collectors.toList());
+        return IntStream.range(1,100).boxed().collect(toList());
     }
 
     /**
