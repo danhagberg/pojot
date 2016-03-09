@@ -116,14 +116,19 @@ public class HashcodeTestRunner<T> extends AbstractEqualityTestRunner<T> {
                             getClassName(), property.getDisplayName()));
                     break;
                 } else {
-                    setFieldVal(instanceTwo, property, field, val.getLargeValue());
-                    if (instanceOne.equals(instanceTwo)) {
-                        errors.add(String.format("Hashcode method test failed for %s.  Non-equal values in %s did not cause different hashcode for instances.",
-                                getClassName(), property.getDisplayName()));
-                        break;
+                    Object alternateTestValue = val.getLargeValue();
+                    // If the test value and alternate test value are the same, bypass test as this type can return
+                    // only one value and can't be used in testing.
+                    if (testVal != alternateTestValue) {
+                        setFieldVal(instanceTwo, property, field, alternateTestValue);
+                        if (instanceOne.equals(instanceTwo)) {
+                            errors.add(String.format("Hashcode method test failed for %s.  Non-equal values in %s did not cause different hashcode for instances.",
+                                    getClassName(), property.getDisplayName()));
+                            break;
+                        }
+                        // Reset instance two value as it passed the test.
+                        setFieldVal(instanceTwo, property, field, testVal);
                     }
-                    // Reset instance two value as it passed the test.
-                    setFieldVal(instanceTwo, property, field, testVal);
                 }
             }
 

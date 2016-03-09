@@ -106,14 +106,19 @@ public class EqualsTestRunner<T> extends AbstractEqualityTestRunner<T> {
                             getClassName(), fieldName));
                     break;
                 } else {
-                    setFieldVal(instanceTwo, property, field, val.getLargeValue());
-                    if (instanceOne.equals(instanceTwo)) {
-                        errors.add(String.format("Equals method test failed for %s.  Non-equal values in %s did not cause inequality for instances.",
-                                getClassName(), fieldName));
-                        break;
+                    Object alternateTestValue = val.getLargeValue();
+                    // If the test value and alternate test value are the same, bypass test as this type can return
+                    // only one value and can't be used in testing.
+                    if (testVal != alternateTestValue) {
+                        setFieldVal(instanceTwo, property, field, alternateTestValue);
+                        if (instanceOne.equals(instanceTwo)) {
+                            errors.add(String.format("Equals method test failed for %s.  Non-equal values in %s did not cause inequality for instances.",
+                                    getClassName(), fieldName));
+                            break;
+                        }
+                        // Reset instance two value as it passed the test.
+                        setFieldVal(instanceTwo, property, field, testVal);
                     }
-                    // Reset instance two value as it passed the test.
-                    setFieldVal(instanceTwo, property, field, testVal);
                 }
             }
         } catch (InstantiationException

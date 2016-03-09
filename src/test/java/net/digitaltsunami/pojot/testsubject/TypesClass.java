@@ -25,6 +25,7 @@ public class TypesClass {
     private short testShort1;
     private Short testShort2;
     private String testString1;
+    private TestEnum testEnum1;
 
     public boolean isTestBoolean1() {
         return testBoolean1;
@@ -178,5 +179,12 @@ public class TypesClass {
         this.testString1 = testString1;
     }
 
+    public TestEnum getTestEnum1() {
+        return testEnum1;
+    }
+
+    public void setTestEnum1(TestEnum testEnum1) {
+        this.testEnum1 = testEnum1;
+    }
 }
 

@@ -46,7 +46,7 @@ public enum PropertyValues {
      */
     public static PropertyValue fromString(String type) {
         PropertyValue provider = types.get(type);
-        return (provider == null) ? new GenericProperty(type) : provider;
+        return (provider == null) ? ValueProviderFactory.getProvider(type) : provider;
     }
 
 
