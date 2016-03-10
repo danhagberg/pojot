@@ -8,6 +8,11 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Performs basic validation on default setters. Default meaning that there is no special logic and the setter
@@ -23,6 +28,7 @@ import java.util.*;
 public class SetterTestRunner<T> extends AbstractTestRunner<T> {
 
     private final Set<PropertyDescriptor> methodsUnderTest;
+    private final Map<String,Field> declaredFields;
 
     /**
      * Create a test runner for the class under test.
@@ -42,6 +48,10 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
     public SetterTestRunner(Class<T> clazz, BeanInfo beanInfo, Set<PropertyDescriptor> methodsUnderTest) {
         super(clazz, beanInfo);
         this.methodsUnderTest = methodsUnderTest;
+        this.declaredFields =
+                Arrays.stream(clazz.getDeclaredFields())
+                        .collect(toMap(field -> field.getName(), identity()));
+
     }
 
 
@@ -74,7 +84,11 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
         }
 
         try {
-            Field field = clazz.getDeclaredField(property.getName());
+            Field field = declaredFields.get(property.getName());
+            if(field == null) {
+                // This is a setter without a property.  Nothing to test.
+                return Optional.empty();
+            }
             Class<?> fieldType = field.getType();
             field.setAccessible(true);
 

@@ -6,6 +6,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+
 /**
  * Performs basic validation on default getters. Default meaning that there is no special logic and the getter
  * simply returns the value in the property.
@@ -13,6 +16,7 @@ import java.util.*;
 public class GetterTestRunner<T> extends AbstractTestRunner<T> {
 
     private final Set<PropertyDescriptor> methodsUnderTest;
+    private final Map<String, Field> declaredFields;
 
     /**
      * Create a test runner for the class under test.
@@ -34,6 +38,9 @@ public class GetterTestRunner<T> extends AbstractTestRunner<T> {
     public GetterTestRunner(Class<T> clazz, BeanInfo beanInfo, Set<PropertyDescriptor> methodsUnderTest) {
         super(clazz, beanInfo);
         this.methodsUnderTest = methodsUnderTest;
+        this.declaredFields =
+                Arrays.stream(clazz.getDeclaredFields())
+                        .collect(toMap(field -> field.getName(), identity()));
     }
 
 
@@ -67,7 +74,11 @@ public class GetterTestRunner<T> extends AbstractTestRunner<T> {
         boolean status;
         Object expected, actual;
         try {
-            Field field = clazz.getDeclaredField(property.getName());
+            Field field = declaredFields.get(property.getName());
+            if(field == null) {
+                // This is a setter without a property.  Nothing to test.
+                return Optional.empty();
+            }
             field.setAccessible(true);
 
             if (property.getPropertyType().isPrimitive()) {
@@ -85,7 +96,7 @@ public class GetterTestRunner<T> extends AbstractTestRunner<T> {
                     status = expected.equals(actual);
                 }
             }
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchFieldException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             throw new TestAidException(
                     String.format("Exception during getter test: %s.%s", getClassName(), property.getReadMethod().getName()), e);
         }

@@ -45,13 +45,4 @@ public class GetterTestRunnerTest {
         assertTrue(errors.size() > 0, "Run test should have returned an error.");
     }
 
-    @Test(expectedExceptions = TestAidException.class)
-    public void testRunTestsWithError() throws Exception {
-        Class<SimpleClass> clazz = SimpleClass.class;
-        BeanInfo beanInfo = Introspector.getBeanInfo(clazz, clazz.getSuperclass());
-        GetterTestRunner<BadGetterSetterClass> testRunner =
-                new GetterTestRunner<>(BadGetterSetterClass.class, beanInfo);
-        testRunner.runTests();
-        fail("An exception should have been thrown");
-    }
 }
