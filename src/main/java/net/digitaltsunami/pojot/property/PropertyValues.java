@@ -1,5 +1,7 @@
 package net.digitaltsunami.pojot.property;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -20,6 +22,8 @@ public enum PropertyValues {
     FloatPropVal(Float.class.getCanonicalName(), new FloatVal()) ,
     IntPrimitivePropVal("int", new IntPrimitiveVal()),
     IntegerPropVal(Integer.class.getCanonicalName(), new IntegerVal()),
+    LocalDatePropVal(LocalDate.class.getCanonicalName(), new LocalDateVal()),
+    LocalDateTimePropVal(LocalDateTime.class.getCanonicalName(), new LocalDateTimeVal()),
     LongPropPrimitiveVal("long", new LongPrimitiveVal()),
     LongPropVal(Long.class.getCanonicalName(), new LongVal()),
     ShortPropPrimitiveVal("short", new ShortPrimitiveVal()),
