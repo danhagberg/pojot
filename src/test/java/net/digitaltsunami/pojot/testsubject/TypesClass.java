@@ -1,5 +1,7 @@
 package net.digitaltsunami.pojot.testsubject;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -21,6 +23,8 @@ public class TypesClass {
     private Integer testInt2;
     private long testLong1;
     private Long testLong2;
+    private LocalDate testLocalDate;
+    private LocalDateTime testLocalDateTime;
     private OtherClass otherClass;
     private short testShort1;
     private Short testShort2;
@@ -186,5 +190,23 @@ public class TypesClass {
     public void setTestEnum1(TestEnum testEnum1) {
         this.testEnum1 = testEnum1;
     }
+
+    public LocalDate getTestLocalDate() {
+        return testLocalDate;
+    }
+
+    public void setTestLocalDate(LocalDate testLocalDate) {
+        this.testLocalDate = testLocalDate;
+    }
+
+    public LocalDateTime getTestLocalDateTime() {
+        return testLocalDateTime;
+    }
+
+    public void setTestLocalDateTime(LocalDateTime testLocalDateTime) {
+        this.testLocalDateTime = testLocalDateTime;
+    }
+
+
 }
 
