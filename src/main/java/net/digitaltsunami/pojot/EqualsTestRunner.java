@@ -92,6 +92,9 @@ public class EqualsTestRunner<T> extends AbstractEqualityTestRunner<T> {
                             .collect(Collectors.toMap(pd -> pd.getName(), Function.identity()));
             for (String fieldName : includeInEquals) {
                 PropertyDescriptor property = descriptorMap.get(fieldName);
+                if (property == null) {
+                    continue; // No property for field name. Skip processing.
+                }
                 Field field = clazz.getDeclaredField(fieldName);
                 Class<?> fieldType = field.getType();
 
