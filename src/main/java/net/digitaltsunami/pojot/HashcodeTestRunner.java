@@ -103,6 +103,9 @@ public class HashcodeTestRunner<T> extends AbstractEqualityTestRunner<T> {
             for (String fieldName : includeInEquals) {
 
                 PropertyDescriptor property = descriptorMap.get(fieldName);
+                if (property == null) {
+                    continue;  // No property for this field name. Skip processing.
+                }
                 Field field = clazz.getDeclaredField(fieldName);
                 Class<?> fieldType = field.getType();
 

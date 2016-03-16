@@ -20,7 +20,7 @@ public class GenericProperty implements PropertyValue {
 
     private Object createInstance() {
         try {
-            Class clazz = Class.forName(type);
+            Class clazz = ValueProviderFactory.getClassForName(type);
             return clazz.newInstance();
         } catch ( ClassNotFoundException
                 | InstantiationException
