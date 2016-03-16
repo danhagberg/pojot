@@ -16,7 +16,7 @@ public class EnumVal implements PropertyValue {
     public EnumVal(String type) {
         this.type = type;
         try {
-            this.enumClazz = (Class<? extends Enum>) Class.forName(type);
+            this.enumClazz = (Class<? extends Enum>) ValueProviderFactory.getClassForName(type);
             numberOfConstants = this.enumClazz.getEnumConstants().length;
         } catch (ClassNotFoundException e) {
             throw new TestAidException("Cannot generate test for type.", e);
