@@ -67,6 +67,7 @@ public class TestAid<T> {
     private final HashSet<String> excludeSetters = new HashSet<>();
     private final HashSet<String> includeInEquals = new HashSet<>();
     private final HashSet<String> excludeFromEquals = new HashSet<>();
+    private final boolean includeSuperIfAbstract;
     private boolean includeAllInEquals;
 
     /**
@@ -76,8 +77,22 @@ public class TestAid<T> {
      * @throws IntrospectionException if failed to extract property and method information from class.
      */
     public TestAid(Class clazz) throws IntrospectionException {
+        this(clazz, false);
+    }
+
+    /**
+     * Create a test aid for the provided class.
+     *
+     * @param clazz Class under test.  Cannot be null.
+     * @param includeSuperIfAbstract include the properties of abstract superclass(es).
+     * @throws IntrospectionException if failed to extract property and method information from class.
+     */
+    public TestAid(Class clazz, boolean includeSuperIfAbstract) throws IntrospectionException {
         this.clazz = clazz;
-        this.beanInfo = Introspector.getBeanInfo(this.clazz, this.clazz.getSuperclass());
+        this.includeSuperIfAbstract = includeSuperIfAbstract;
+        Class stopClass =
+                includeSuperIfAbstract ? getFirstConcreteParent(clazz) : clazz.getSuperclass();
+        this.beanInfo = Introspector.getBeanInfo(clazz, stopClass);
         for (MethodDescriptor m : beanInfo.getMethodDescriptors()) {
             beanMethodsMap.put(m.getDisplayName(), m);
         }
@@ -499,4 +514,52 @@ public class TestAid<T> {
                     .collect(Collectors.toSet());
         }
     }
+
+    /**
+     * Return a list of classes up to, but not including first non-abstract class.
+     * @param clazz starting class for which the lineage is being extracted.
+     * @return a non-empty list with the input class as the first element followed
+     * by each abstract class up the hierarchy.
+     */
+    public static List<Class> getAbstractLineage(Class clazz) {
+        List<Class> lineage = new ArrayList<>();
+        lineage.add(clazz);
+        Class parent = clazz.getSuperclass();
+        while(Modifier.isAbstract(parent.getModifiers())) {
+            lineage.add(parent);
+            parent = parent.getSuperclass();
+        }
+        return lineage;
+    }
+
+    /**
+     * Return the first concrete parent class of the provided class.
+     * @param clazz starting class for which the lineage is being checked.
+     * @return Class that is the first non-null class.
+     */
+    public static Class getFirstConcreteParent(Class clazz) {
+        Class parent = clazz.getSuperclass();
+        while(Modifier.isAbstract(parent.getModifiers())) {
+            parent = parent.getSuperclass();
+        }
+        return parent;
+    }
+
+    /**
+     * Return a set of declared fields for the provided concrete class and all abstract classes
+     * up to, but not including the first concrete parent class.
+     * <p>
+     *     If the parent of the provided class is concrete, then only the declared fields of the provided
+     *     class will be returned.
+     * </p>
+     * @param clazz concrete class used as starting point.
+     * @return a set of 0 to many Fields.
+     */
+    public static Set<Field> getDeclaredFieldsFromLineage(Class clazz) {
+        return getAbstractLineage(clazz).stream()
+                .map(clazz2 -> clazz2.getDeclaredFields())
+                .flatMap(fields -> Arrays.stream(fields))
+                .collect(Collectors.toSet());
+    }
+
 }
