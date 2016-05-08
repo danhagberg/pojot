@@ -49,7 +49,8 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
         super(clazz, beanInfo);
         this.methodsUnderTest = methodsUnderTest;
         this.declaredFields =
-                Arrays.stream(clazz.getDeclaredFields())
+                TestAid.getDeclaredFieldsFromLineage(clazz).stream()
+                        .filter(field -> !field.isSynthetic())
                         .collect(toMap(field -> field.getName(), identity()));
 
     }
