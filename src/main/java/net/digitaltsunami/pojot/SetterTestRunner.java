@@ -7,9 +7,8 @@ import java.beans.BeanInfo;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -29,6 +28,7 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
 
     private final Set<PropertyDescriptor> methodsUnderTest;
     private final Map<String,Field> declaredFields;
+    private boolean fluentStyle;
 
     /**
      * Create a test runner for the class under test.
@@ -52,7 +52,11 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
                 TestAid.getDeclaredFieldsFromLineage(clazz).stream()
                         .filter(field -> !field.isSynthetic())
                         .collect(toMap(field -> field.getName(), identity()));
+    }
 
+    public SetterTestRunner<T> setFluentStyle(boolean fluentStyle) {
+        this.fluentStyle = fluentStyle;
+        return this;
     }
 
 
@@ -80,7 +84,11 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
      * @return Optional with message if error occurred, otherwise empty.
      */
     private Optional<String> testSetter(T instance, PropertyDescriptor property) {
-        if (property.getWriteMethod() == null) {
+        Method setter = property.getWriteMethod();
+        if (setter == null && fluentStyle) {
+                setter = locateWriteMethod(property);
+        }
+        if (setter == null) {
             return Optional.empty();
         }
 
@@ -95,17 +103,17 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
 
             PropertyValue val = PropertyValues.fromString(fieldType.getCanonicalName());
 
-            Optional<String> message = testSetterWithVal(instance, property, field, val.getValue());
+            Optional<String> message = testSetterWithVal(instance, setter, property, field, val.getValue());
             if (message.isPresent()) return message;
 
-            message = testSetterWithVal(instance, property, field, val.getSmallValue());
+            message = testSetterWithVal(instance, setter, property, field, val.getSmallValue());
             if (message.isPresent()) return message;
 
-            message = testSetterWithVal(instance, property, field, val.getLargeValue());
+            message = testSetterWithVal(instance, setter, property, field, val.getLargeValue());
             if (message.isPresent()) return message;
 
             if (!fieldType.isPrimitive()) {
-                message = testSetterWithVal(instance, property, field, val.getDefaultValue());
+                message = testSetterWithVal(instance, setter, property, field, val.getDefaultValue());
                 if (message.isPresent()) return message;
             }
             if (message.isPresent()) return message;
@@ -119,6 +127,7 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
     /**
      * Perform one setter operation with the provided value.
      * @param instance Instance of class under test to operate on.
+     * @param setter method determined to be setter method for the property.
      * @param property Property being tested
      * @param field Field being tested
      * @param testVal Test value to use.
@@ -126,13 +135,12 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    private Optional<String> testSetterWithVal(T instance, PropertyDescriptor property, Field field, Object
+    private Optional<String> testSetterWithVal(T instance, Method setter, PropertyDescriptor property, Field field, Object
             testVal) throws InvocationTargetException, IllegalAccessException {
 
         Objects.requireNonNull(instance, "Instance of target class required.");
         boolean status = true;
-        property.getWriteMethod()
-                .invoke(instance, testVal);
+        setter.invoke(instance, testVal);
 
         Object expected, actual;
         if (property.getPropertyType().isPrimitive()) {
@@ -140,7 +148,6 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
             actual = String.valueOf(field.get(instance));
             status = expected.equals(actual);
         } else {
-
             expected = testVal;
             actual = field.get(instance);
 
@@ -155,4 +162,15 @@ public class SetterTestRunner<T> extends AbstractTestRunner<T> {
         }
         return Optional.empty();
     }
+
+    private Method locateWriteMethod(PropertyDescriptor property) {
+        String setterName = String.format("set%s%s", property.getName().substring(0,1).toUpperCase(), property.getName().substring(1));
+        try {
+            return clazz.getMethod(setterName, property.getPropertyType());
+        } catch (NoSuchMethodException ignore) {
+            // No setter for this property. Ignore
+        }
+        return null;
+    }
+
 }
