@@ -33,6 +33,20 @@ import java.util.stream.Collectors;
  * }
  * </pre>
  *
+ * <h4>Fluent Style Setters</h4>
+ *
+ * Default processing does not include fluent or builder style setters for the class under test.
+ * These setters return an instance of the class to allow the setters to chained.  Normal bean
+ * processing does not return these as setters; therefore, they will be skipped.
+ * Testing of fluent style setters can be enabled using {@link #setClassUsesFluentSetters(boolean)}
+ * <pre>
+ * {@code
+ * List<String> errors = new TestAid<SimpleClass>(SimpleClass.class)
+ *                              .setClassUsesFluentSetters(true)
+ *                              .validate();
+ * }
+ * </pre>
+ *
  * <h3>Equals and HashCode Testing</h3>
  * Equals and hashCode testing are expected to use the same fields.  If no fields are specified, then the equals
  * and hashCode methods are tested to ensure that the default methods are used.  If fields are specified, then
@@ -69,6 +83,7 @@ public class TestAid<T> {
     private final HashSet<String> excludeFromEquals = new HashSet<>();
     private final boolean includeSuperIfAbstract;
     private boolean includeAllInEquals;
+    private boolean classUsesFluentSetters;
 
     /**
      * Create a test aid for the provided class.
@@ -206,6 +221,20 @@ public class TestAid<T> {
     }
 
     /**
+     * Indicate that the class under test using fluent or builder style setters. These setters return an
+     * instance of the class to allow the setters to chained.  Normal bean processing does not return these
+     * as setters; therefore, they will be skipped.
+     * If the classUsesFluentSetters value is set to true, if a setter cannot be found via the bean properties,
+     * the a method with the signature set[propertyName](propertyType) will be used if found.
+     * @param classUsesFluentSetters true if the class uses fluent style setter, false otherwise.
+     * @return Current instance to allow fluent invocation.
+     */
+    public TestAid setClassUsesFluentSetters(boolean classUsesFluentSetters) {
+        this.classUsesFluentSetters = classUsesFluentSetters;
+        return this;
+    }
+
+    /**
      * Set of fields that are used to test equality and hashCode logic of the class under test.
      * <p>
      * NOTE: The that the default set of fields is empty. Equals and hashCode testing will be performed only if
@@ -317,7 +346,9 @@ public class TestAid<T> {
         final List<String> errors = new ArrayList<>();
         Set<PropertyDescriptor> fields = getSettersToCheck();
         if (!fields.isEmpty()) {
-            errors.addAll(new SetterTestRunner(clazz, beanInfo, fields).runTests());
+            errors.addAll(new SetterTestRunner(clazz, beanInfo, fields)
+                    .setFluentStyle(classUsesFluentSetters)
+                    .runTests());
         }
         return errors;
     }
