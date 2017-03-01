@@ -126,6 +126,20 @@ public void testBasicCustomerMethods() throws IntrospectionException {
     assertTrue(errors.toString(), errors.isEmpty());
 }
 ```
+### Including fluent or builder type setters.
+Default processing does not include fluent or builder style setters for the class under test. 
+These setters return an instance of the class to allow the setters to chained.  Normal bean 
+processing does not return these as setters; therefore, they will be skipped.
+Fluent style setters can be enabled using TestAid
+``` java
+@Test
+public void testSettersUseFluentStyle() throws IntrospectionException {
+    List<String> errors = new TestAid(FluentSetterClass.class)
+            .setClassUsesFluentSetters(true)
+            .validate();
+    assertTrue(errors.toString(), errors.isEmpty());
+}
+```
 
 ### Provide code coverage for basic enum
 The EnumExerciser will return the number of values that it covered.  

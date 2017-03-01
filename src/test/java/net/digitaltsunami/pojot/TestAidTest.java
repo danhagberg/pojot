@@ -2,7 +2,9 @@ package net.digitaltsunami.pojot;
 
 import net.digitaltsunami.pojot.testsubject.EqualsHashAllFieldsTestClass;
 import net.digitaltsunami.pojot.testsubject.EqualsHashTestClass;
+import net.digitaltsunami.pojot.testsubject.FluentSetterClass;
 import net.digitaltsunami.pojot.testsubject.SimpleClass;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.beans.IntrospectionException;
@@ -184,6 +186,15 @@ public class TestAidTest {
         TestAid ta = new TestAid(EqualsHashTestClass.class);
         ta.includeInEquals(EqualsHashTestClass.getFieldsNotInEquals().toArray(new String[]{}));
         List<String> errors = ta.runHashTests();
+        assertTrue(errors.size() > 0, errors.toString());
+    }
+
+    @Test
+    public void testSettersUseFluentStyle() throws IntrospectionException {
+        List<String> errors = new TestAid(FluentSetterClass.class)
+                .setClassUsesFluentSetters(true)
+                .validate();
+        // Fluent class has a setter that should cause an error. Only way to ensure fluent setters are tested.
         assertTrue(errors.size() > 0, errors.toString());
     }
 
