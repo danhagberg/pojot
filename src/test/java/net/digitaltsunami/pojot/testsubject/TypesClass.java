@@ -1,5 +1,6 @@
 package net.digitaltsunami.pojot.testsubject;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -30,6 +31,7 @@ public class TypesClass {
     private Short testShort2;
     private String testString1;
     private TestEnum testEnum1;
+    private Timestamp testTimestamp;
 
     public boolean isTestBoolean1() {
         return testBoolean1;
@@ -207,6 +209,12 @@ public class TypesClass {
         this.testLocalDateTime = testLocalDateTime;
     }
 
+    public Timestamp getTestTimestamp() {
+        return testTimestamp;
+    }
 
+    public void setTestTimestamp(Timestamp testTimestamp) {
+        this.testTimestamp = testTimestamp;
+    }
 }
 

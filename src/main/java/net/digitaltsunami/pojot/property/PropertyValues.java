@@ -1,5 +1,6 @@
 package net.digitaltsunami.pojot.property;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -31,7 +32,8 @@ public enum PropertyValues {
     StringPropVal(String.class.getCanonicalName(), new StringVal()),
     SetsPropVal(Set.class.getCanonicalName(), new SetVal()),
     MapPropVal(Map.class.getCanonicalName(), new MapVal()),
-    ListPropVal(List.class.getCanonicalName(), new ListVal())
+    ListPropVal(List.class.getCanonicalName(), new ListVal()),
+    SqlTimestampVal(Timestamp.class.getCanonicalName(), new SqlTimestampVal())
    ;
 
 
