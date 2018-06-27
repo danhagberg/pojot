@@ -2,7 +2,8 @@ Pojot
 =====
 Provides test coverage of methods such as basic getters and setters, equals and hashcode testing, and enums.
 
-[![Circle CI](https://circleci.com/gh/danhagberg/pojot.svg?style=svg&circle-token=e554fafca069e81e8ce2c9c2ff2fa2bfce82d1b3)](https://circleci.com/gh/danhagberg/pojot) [![Download](https://api.bintray.com/packages/danhagberg/maven/pojot/images/download.svg) ](https://bintray.com/danhagberg/maven/pojot/_latestVersion)
+[![Circle CI](https://circleci.com/gh/danhagberg/pojot.svg?style=svg&circle-token=e554fafca069e81e8ce2c9c2ff2fa2bfce82d1b3)](https://circleci.com/gh/danhagberg/pojot) [![Download](https://api.bintray.com/packages/danhagberg/maven/pojot/images/download.svg) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdanhagberg%2Fpojot.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdanhagberg%2Fpojot?ref=badge_shield)
+](https://bintray.com/danhagberg/maven/pojot/_latestVersion)
 
 [Javadocs](http://digitaltsunami.net/projects/pojot/site/apidocs/index.html)
 
@@ -149,3 +150,7 @@ public void testExercise() throws Exception {
     assertTrue("Failed to exercise enum", EnumExerciser.exercise(EnumUnderTest.class) > 0L);
 }
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdanhagberg%2Fpojot.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdanhagberg%2Fpojot?ref=badge_large)
